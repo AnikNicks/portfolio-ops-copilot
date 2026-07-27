@@ -1,0 +1,11 @@
+# Core pipeline + app
+pandas>=3.0
+streamlit>=1.60
+pydantic>=2.13
+pypdf>=6.14
+
+# Only used by the one-off synthetic-data generator scripts under
+# data/synthetic/<company>/ (generate_financials.py, contracts/generate_contracts.py) -
+# not required to run the pipeline or the app itself.
+openpyxl>=3.1
+reportlab>=5.0

@@ -1,0 +1,57 @@
+{
+  "company": "acme-distribution",
+  "contracts_reviewed": [
+    "vendor_contract_freight.pdf",
+    "vendor_contract_raw_materials.pdf"
+  ],
+  "clause_risks": [
+    {
+      "contract_file": "vendor_contract_freight.pdf",
+      "clause_type": "auto_renewal",
+      "quoted_text": "Unless either Party provides the other with written notice of non-renewal not less than one hundred twenty (120) days prior to the expiration of the Initial Term or any Renewal Term, this Agreement shall automatically renew for successive twenty-four (24) month terms (each, a \"Renewal Term\") on the same terms and conditions then in effect, and Customer shall have no right to renegotiate rates during any such Renewal Term.",
+      "risk_summary": "Auto-renewal trap (vendor_contract_freight.pdf#4): a single missed 120-day notice deadline silently re-commits Acme to a 24-month Renewal Term with no contractual right to renegotiate rates for the entire renewal -- so any market freight-rate decline, or leverage from a competitive re-tender, is unavailable for up to two years at a time. This compounds with the uncapped fuel surcharge in Section 5 (vendor_contract_freight.pdf#5), since base rates cannot be revisited even while the surcharge keeps moving. Schedule A rate figures and Acme's shipment volumes are not present in the extracted contract text, so the dollar range below is directional, scaled to a mid-size distributor's outbound freight program rather than derived from an in-contract dollar figure.",
+      "dollar_impact_low": 25000,
+      "dollar_impact_high": 150000
+    },
+    {
+      "contract_file": "vendor_contract_freight.pdf",
+      "clause_type": "pricing_escalator",
+      "quoted_text": "Base rates are set out in Schedule A and are subject to a monthly fuel surcharge adjustment published by Carrier. Rates in Schedule A shall otherwise remain fixed during the Initial Term.",
+      "risk_summary": "Pricing escalator (vendor_contract_freight.pdf#5): the fuel surcharge is set unilaterally by Dominion ('published by Carrier'), adjusts monthly, and carries no cap, index reference, or Acme approval right anywhere in the extracted text -- it is explicitly carved out of the 'rates otherwise remain fixed' protection in the same sentence. Because Acme is the paying party, every surcharge move is a direct pass-through cost with no contractual ceiling. No surcharge formula, historical rate, or Schedule A pricing is present in the extracted text, so this range is directional rather than derived from disclosed figures.",
+      "dollar_impact_low": 15000,
+      "dollar_impact_high": 100000
+    },
+    {
+      "contract_file": "vendor_contract_freight.pdf",
+      "clause_type": "termination",
+      "quoted_text": "Except as set out in Section 4, neither Party may terminate this Agreement for convenience during the Initial Term or any Renewal Term.",
+      "risk_summary": "Termination risk (vendor_contract_freight.pdf#6): there is no termination-for-convenience right at all during either the 36-month Initial Term or any 24-month Renewal Term -- the only exit is the Section 4 non-renewal notice, which itself is stripped of any rate-renegotiation right once triggered late or missed. If Dominion's service quality degrades or a materially cheaper carrier becomes available mid-term, Acme has no contractual off-ramp and must ride out the full term. Directional estimate: no Schedule A cost figures are present in the extracted text to size the opportunity cost precisely.",
+      "dollar_impact_low": 10000,
+      "dollar_impact_high": 75000
+    },
+    {
+      "contract_file": "vendor_contract_raw_materials.pdf",
+      "clause_type": "pricing_escalator",
+      "quoted_text": "Commencing on the first anniversary of the Effective Date and on each anniversary thereafter, Base Prices shall automatically increase by the greater of (a) four percent (4%), or (b) the year-over-year percentage change in the Statistics Canada Industrial Product Price Index for the preceding twelve-month period, without further notice to or consent from Customer, unless Customer terminates this Agreement in accordance with Section 6 at least sixty (60) days prior to the applicable anniversary date.",
+      "risk_summary": "Pricing escalator (vendor_contract_raw_materials.pdf#3): Base Prices increase automatically every year by the greater of a guaranteed 4% floor or the trailing Statistics Canada IPPI change, uncapped on the upside and applied 'without further notice to or consent from Customer.' Steelcore is the supplier and Acme is the buyer, so 100% of this escalation is a direct cost increase to Acme -- this is the one escalator across both contracts with an explicit percentage grounded in the text (a guaranteed >=4% compounding annual increase, ~12.5% cumulative over the 3-year Initial Term before any index upside). The only stated escape is a full Section 6 termination at least 60 days before the anniversary, meaning Acme cannot reject the price increase alone while keeping the supply relationship. Absolute dollar figures cannot be pinned exactly because Schedule A per-unit Base Prices and order volumes are not present in the extracted text, so the range below is directional, scaled off the disclosed 4% floor plus plausible index upside on a meaningful raw-materials spend category.",
+      "dollar_impact_low": 40000,
+      "dollar_impact_high": 200000
+    },
+    {
+      "contract_file": "vendor_contract_raw_materials.pdf",
+      "clause_type": "termination",
+      "quoted_text": "Customer agrees to purchase not less than eighty-five percent (85%) of its annual requirements for the Products from Supplier during each Contract Year.",
+      "risk_summary": "Volume-commitment lock-in (vendor_contract_raw_materials.pdf#4): an 85% minimum-requirements commitment sharply restricts Acme's ability to shift purchasing to a lower-cost or better-performing supplier even after the Section 3 escalator (vendor_contract_raw_materials.pdf#3) pushes Steelcore's prices above market. This functions as a de facto barrier to using competitive sourcing as leverage against the annual price increase -- whatever that increase is, it applies to at least 85% of Acme's volume in this category by contractual requirement, not by choice. Exact dollar exposure is directional because Schedule A unit prices and Acme's total annual raw-material spend are not present in the extracted text; the range reflects the scale of restricting ~85% of a meaningful input-cost category rather than a small remainder.",
+      "dollar_impact_low": 30000,
+      "dollar_impact_high": 150000
+    },
+    {
+      "contract_file": "vendor_contract_raw_materials.pdf",
+      "clause_type": "auto_renewal",
+      "quoted_text": "This Agreement has an initial term of three (3) years from the Effective Date and shall renew automatically for successive one (1) year terms unless either Party gives at least sixty (60) days' written notice of non-renewal prior to the end of the then-current term.",
+      "risk_summary": "Auto-renewal trap (vendor_contract_raw_materials.pdf#6): on its own, a 60-day notice window on 1-year renewal terms is a fairly standard cadence, but it is the same 60-day pre-anniversary deadline Section 3 (vendor_contract_raw_materials.pdf#3) requires Acme to use in order to avoid that year's automatic price increase -- and exercising it means terminating the whole supply agreement, not just the price term, with a supplier whose standard lead time is only 10 business days (Section 5). Acme is forced to choose, inside a narrow annual window, between accepting a compounding price increase or unwinding a live supply line covering at least 85% of its requirement (Section 4) with limited runway to re-source. Directional estimate given no Schedule A pricing figures are present in the extracted text; the exposure is effectively the same compounding escalator quantified above, repeated each year the window is missed.",
+      "dollar_impact_low": 15000,
+      "dollar_impact_high": 80000
+    }
+  ]
+}

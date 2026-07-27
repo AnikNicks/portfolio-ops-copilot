@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+~$*.xlsx
+
+# Claude Code runtime/local artifacts - never shared, machine/session specific
+.claude/scheduled_tasks.lock
+.claude/settings.local.json

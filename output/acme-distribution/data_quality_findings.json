@@ -1,0 +1,57 @@
+{
+  "company": "acme-distribution",
+  "source_system": "Salesforce-style CRM export (inferred from Account ID / Account Owner / Annual Revenue column conventions)",
+  "record_count": 14,
+  "duplicate_count": 10,
+  "missing_field_rate_pct": 57.1,
+  "findings": [
+    {
+      "title": "Duplicate accounts from inconsistent legal-suffix naming",
+      "description": "Four account pairs represent the same underlying company entered twice under different Account IDs, differentiated only by legal-suffix formatting or region label: (A-1001) 'Northern Rail Supply Co.' vs (A-1002) 'Northern Rail Supply'; (A-1004) 'Grandview Logistics Inc' vs (A-1005) 'Grandview Logistics'; (A-1009) 'Maple Ridge Distribution' vs (A-1010) 'Maple Ridge Distribution Ltd.'; (A-1013) 'Redline Trucking' vs (A-1014) 'Redline Trucking Co'. Each pair shares the same contact and phone/email where present, confirming they are the same account, not two locations. This double-counts revenue in rollups and creates a risk of two reps (or the same rep working two open tasks) independently contacting the account. Assumption: each duplicate pair costs an estimated $3,000-$6,000/year in redundant rep outreach time, CRM admin cleanup, and double-counted pipeline/territory revenue (based on ~2-4 hours/quarter of duplicate reconciliation work at a loaded rep/ops rate of ~$75/hr, plus forecast-accuracy risk). Applied across 4 pairs: $12,000-$24,000/year.",
+      "dollar_impact_low": 12000,
+      "dollar_impact_high": 24000,
+      "confidence": "medium",
+      "evidence": ["A-1001", "A-1002", "A-1004", "A-1005", "A-1009", "A-1010", "A-1013", "A-1014"]
+    },
+    {
+      "title": "Fragmented account record from blank company name on re-entry",
+      "description": "A-1007 ('Coastal Freight Alliance') and A-1008 (Company Name left blank) share the identical contact (Ben O'Reilly), email, revenue ($205,000), region (BC), last-activity date, and owner (J. Petrov) but split the phone/email fields between the two rows (A-1007 has email but no phone; A-1008 has phone but no email, and no company name at all). This looks like a contact re-entered under a new Account ID without carrying over the company name, effectively hiding the account behind a blank name field in list views and reports. Assumption: a blank company name on an active $205K account creates a real risk the account owner or a report filter misses it entirely for a full review cycle, estimated at $3,000-$6,000/year in lost visibility/administrative cleanup cost, consistent with the single-pair assumption used above.",
+      "dollar_impact_low": 3000,
+      "dollar_impact_high": 6000,
+      "confidence": "medium",
+      "evidence": ["A-1007", "A-1008"]
+    },
+    {
+      "title": "Missing contact-channel fields (contact name, email, or phone) block owner outreach",
+      "description": "6 of 14 records (43%) are missing at least one core contact-channel field needed to reach the account: A-1002 (no phone), A-1003 (no contact name), A-1006 (no email), A-1007 (no phone), A-1012 (no contact name), A-1014 (no email). Without a name plus at least one working channel, the account owner cannot act on a renewal, escalation, or upsell signal without manual research. Assumption: a record missing a contact channel carries a 3-8% annual chance that the owner misses a material touchpoint (renewal risk, churn signal, escalation) on that account's revenue. Average annual revenue across the 12 records with revenue populated is ~$133,000; applying 3-8% risk-weighting across the 6 affected records yields $24,000-$64,000/year of revenue exposure.",
+      "dollar_impact_low": 24000,
+      "dollar_impact_high": 64000,
+      "confidence": "medium",
+      "evidence": ["A-1002", "A-1003", "A-1006", "A-1007", "A-1012", "A-1014"]
+    },
+    {
+      "title": "Missing revenue and last-activity fields degrade forecasting and account-health tracking",
+      "description": "A-1003 and A-1012 have no Annual Revenue value at all, and A-1011 has no Last Activity date. Revenue rollups by territory/owner will silently under-count these accounts, and A-1011 cannot be scored for account-health/engagement recency since there is no activity timestamp to measure against. Assumption: on a tracked revenue base of ~$1.6M across the 12 revenue-populated accounts, a 0.5-1.5% forecasting distortion from these blind spots (driven by unknown revenue for 2 accounts plus one un-scoreable account) is a reasonable estimate, i.e. $8,000-$20,000/year in mis-forecasted territory revenue and missed re-engagement triggers.",
+      "dollar_impact_low": 8000,
+      "dollar_impact_high": 20000,
+      "confidence": "low",
+      "evidence": ["A-1003", "A-1012", "A-1011"]
+    },
+    {
+      "title": "Region naming drift (province abbreviation vs. full name) mis-segments territory reporting",
+      "description": "The Region field is abbreviated (ON, QC, AB, BC, MB) on 11 of 14 records but spelled out in full on the duplicate-pair counterpart of 3 accounts: A-1002 uses 'Ontario' (vs. 'ON' elsewhere), A-1005 uses 'Quebec' (vs. 'QC'), and A-1014 uses 'Manitoba' (vs. 'MB'). Any territory rollup or dashboard filter keyed on the abbreviation will silently exclude these 3 records from their correct region bucket, understating that territory's account count and revenue. Assumption: each misclassified record costs roughly $1,000-$3,000/year in mis-routed sales-ops/territory-planning time and reporting rework, yielding $3,000-$9,000/year across the 3 affected records.",
+      "dollar_impact_low": 3000,
+      "dollar_impact_high": 9000,
+      "confidence": "low",
+      "evidence": ["A-1002", "A-1005", "A-1014"]
+    },
+    {
+      "title": "Stale or missing last-activity dates risk silent account abandonment",
+      "description": "A-1010 shows a Last Activity date of 2023-09-12 (nearly 3 years stale relative to the 2026-07-26 analysis date) despite being an active-looking $138,000 account, A-1006 shows 2024-08-19 (~2 years stale), and A-1011 has no Last Activity date at all. None of these accounts appear on any 'recently closed' or 'churned' list in the export, suggesting they are simply falling through the cracks of active pipeline management rather than being deliberately closed out. Assumption: a stale/missing last-activity flag on an open account carries roughly a 5% annual risk of the account lapsing unnoticed before renewal; applied to the combined ~$276,000 of revenue on A-1006 and A-1010 (A-1011 has no revenue on file), that is approximately $6,000-$14,000/year of at-risk revenue from delayed re-engagement.",
+      "dollar_impact_low": 6000,
+      "dollar_impact_high": 14000,
+      "confidence": "low",
+      "evidence": ["A-1006", "A-1010", "A-1011"]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "company": "acme-distribution",
+  "period_covered": "Mar-25 to Feb-26",
+  "revenue": 7652740.0,
+  "gross_margin_pct": 34.48,
+  "findings": [
+    {
+      "title": "Gross margin compressed ~1.7 points starting Dec-25 - real and currency-neutral",
+      "description": "COGS as a % of revenue was tight and stable, averaging 65.06% from Mar-25 through Nov-25, then stepped up to an average 66.75% for Dec-25 through Feb-26 - about a 1.5-1.8 point deterioration that shows up identically whether measured on the reported CAD figures or on the underlying USD figures (dividing both revenue and COGS by the same 1.37 conversion factor leaves the ratio unchanged, so this is not an FX artifact, unlike the OpEx finding below). Reported gross_margin_pct falls from a 34.94% average (Mar-Nov) to a 33.25% average (Dec-Feb), consistent with the normalizer's own 'COGS % creeping' flag on Nov-25. This looks like a real, sticky cost-structure change (supplier pricing, freight, or input-cost mix) that should be traced to a specific driver before it becomes entrenched in the run-rate.",
+      "dollar_impact_low": 125000.0,
+      "dollar_impact_high": 150000.0,
+      "confidence": "medium",
+      "evidence": [
+        "gross_margin_pct: Mar-25=34.97 ... Nov-25=34.90 (9-month avg 34.94%) vs Dec-25=33.20, Jan-26=33.27, Feb-26=33.27 (3-month avg 33.25%)",
+        "COGS/revenue ratio Mar-25 398000/612000=65.03% through Nov-25 391251/601000=65.10% (9-month avg 65.06%) vs Dec-25 447513.24/669930=66.80%, Jan-26 458950/687740=66.73%, Feb-26 467170/700070=66.73% (3-month avg 66.75%) - ratio is unchanged if the same-currency (pre-conversion) revenue/COGS pairs are used instead, confirming this is not an FX artifact",
+        "normalization_issues: 'Nov-25: ... COGS % creeping'",
+        "Trailing-3-month average revenue $685,913/month annualized to ~$8,230,960; a 1.54-1.82pp margin gap on that base = ~$126,700-$149,800/year"
+      ]
+    },
+    {
+      "title": "Working capital deterioration: AR days climbed from 41 to 71 with no reversal",
+      "description": "Days sales in AR rose almost every month across the full period, from a Mar-Jun-25 average of 41.5 days to 66-71 days in Dec-25 through Feb-26, a 27-32 day increase in average collection period. The normalizer's own source_notes explicitly flag 'AR aging up' for Aug-25, Sep-25, and Oct-25, and the metric kept climbing afterward without any reversal. Revenue was flat to modestly up over the same window, so this reads as a collections/credit-control issue rather than a demand problem. At the ~$20,966/day average revenue run-rate for the full period, this incremental 27-32 days of receivables represents roughly $565,000-$671,000 of cash now tied up in AR relative to the Mar-Jun-25 baseline - a cash-flow/liquidity impact, not a P&L impact, before any additional bad-debt or cost-of-capital carry on the aged balances.",
+      "dollar_impact_low": 565000.0,
+      "dollar_impact_high": 671000.0,
+      "confidence": "high",
+      "evidence": [
+        "ar_days: Mar-25=41, Apr-25=44, May-25=39, Jun-25=42 (avg 41.5) vs Dec-25=66, Jan-26=69, Feb-26=71 (avg 68.7); low point May-25=39 vs high point Feb-26=71 (32-day spread)",
+        "source_notes = 'AR aging up' present on Aug-25, Sep-25, and Oct-25 rows",
+        "12-month revenue_cad total = $7,652,740 across all months => avg daily revenue ~$20,966; 27-32 incremental days x $20,966/day = ~$566,000-$671,000"
+      ]
+    },
+    {
+      "title": "As-reported EBITDA turns negative in Dec-25 through Feb-26",
+      "description": "As reported, ebitda_cad was positive every month from Mar-25 ($49,000) through Nov-25 ($22,749), averaging $40,972/month, then negative for three straight months: Dec-25 -$36,513, Jan-26 -$32,880, Feb-26 -$31,510, averaging -$33,634/month. Taken at face value this is a swing of roughly $850,000-$1,090,000/year at an annualized run-rate. However, this raw number should not be used for planning as-is: the next finding shows strong evidence that most of the Dec-Feb OpEx increase in CAD terms is a normalization artifact rather than a genuine cost increase. Netting that likely artifact out, the real underlying EBITDA deterioration is probably much closer to the currency-neutral gross-margin-compression finding above (~$125,000-$150,000/year). The raw figures themselves are reported with high confidence (they are exactly what the normalized data shows); confidence that they represent a real $850K+/year operating collapse is low.",
+      "dollar_impact_low": 850000.0,
+      "dollar_impact_high": 1090000.0,
+      "confidence": "low",
+      "evidence": [
+        "ebitda_cad: Mar-25=49000, Apr-25=41000, May-25=51000, Jun-25=54000, Jul-25=48000, Aug-25=34000, Sep-25=37000, Oct-25=32000, Nov-25=22749 (9-month avg ~40,972) vs Dec-25=-36513.24, Jan-26=-32880.0, Feb-26=-31510.0 (3-month avg ~-33,634)",
+        "Swing range: best prior month Jun-25 ($54,000) vs worst recent month Dec-25 (-$36,513) = $90,513/month at the high end; Nov-25 ($22,749) vs Feb-26 (-$31,510) = $54,259/month at the low end; annualized = ~$651,000-$1,086,000, widened slightly to $850K-$1.09M to reflect the full 3-month average swing",
+        "Dec-25/Jan-26/Feb-26 source_notes = 'USD - not converted' (see next finding for why this materially affects the reported EBITDA figure)"
+      ]
+    },
+    {
+      "title": "Likely normalizer artifact: blanket USD-to-CAD conversion probably overstates Dec-Feb OpEx by ~$70K/month",
+      "description": "The normalizer applies the fixed 1.37 USD-to-CAD rate uniformly to Revenue, COGS, and OpEx whenever a month's Notes field contains 'USD'. Reversing that conversion on OpEx for Dec-25/Jan-26/Feb-26 produces clean, trend-consistent figures ($189,000 / $191,000 / $193,000) that sit almost exactly on the smooth Mar-25-Nov-25 OpEx trend ($165,000 -> $187,000 over 8 months, ~$2,750/month slope, projecting $189,750 / $192,500 / $195,250 for Dec/Jan/Feb - within 1-2% of the reversed figures). The as-converted CAD OpEx instead jumps 38% month-over-month from Nov-25 to Dec-25 with no trend continuity. This pattern is suggestive (though not conclusive from the normalized data alone) that OpEx for these three months was already recorded in CAD - or in a different unit/currency than Revenue and COGS - and that the normalizer's blanket 'if USD in Notes, convert every column' rule is overstating OpEx, and therefore understating EBITDA, by roughly $70,000/month. This should be confirmed directly with the controller (what currency was OpEx actually recorded in?) before the Dec-Feb OpEx or EBITDA figures are used for any decision.",
+      "dollar_impact_low": 212000.0,
+      "dollar_impact_high": 848000.0,
+      "confidence": "medium",
+      "evidence": [
+        "opex_cad Dec-25=258930 vs reversed (258930/1.37)=189000.0 exactly; Jan-26=261670 vs reversed 191000.0 exactly; Feb-26=264410 vs reversed 193000.0 exactly",
+        "Mar-25-Nov-25 opex_cad trend: 165000 -> 168000 -> 171000 -> 174000 -> 176000 -> 179000 -> 182000 -> 184000 -> 187000 (~$2,750/month average slope); projected Dec/Jan/Feb = 189,750 / 192,500 / 195,250, within 1-2% of the reversed OpEx figures above",
+        "Excess of as-converted opex_cad over the reversed/trend-consistent figures: Dec-25 258930-189000=$69,930; Jan-26 261670-191000=$70,670; Feb-26 264410-193000=$71,410 (avg ~$70,670/month; observed 3-month total $212,010; annualized if the pattern recurs every quarter = ~$848,040)",
+        "normalization_issues: 'Dec-25/Jan-26/Feb-26: figures reported in USD per Notes column; converted to CAD at 1.37'; pipeline/normalize.py converts Revenue, COGS, and OpEx uniformly whenever 'USD' appears in Notes with no per-line-item currency check"
+      ]
+    },
+    {
+      "title": "Source ledger's own Gross Profit column materially disagrees with Revenue-COGS in the 3 most recent months, plus unevaluated formula strings",
+      "description": "The raw export's own 'Gross Profit' column disagreed with the computed Revenue-minus-COGS figure in 4 of the 12 months reviewed - immaterially in Nov-25 (~$251 gap) but materially in the 3 most recent months: Dec-25 (stated $162,000 vs computed $222,417, a $60,417 understatement), Jan-26 (stated $167,000 vs computed $228,790, a $61,790 understatement), and Feb-26 (stated $170,000 vs computed $232,900, a $62,900 understatement). Separately, Nov-25 and Dec-25 COGS were left in the source file as unevaluated text formulas rather than computed values. All of this is concentrated in exactly the same three USD-denominated months, indicating a live reliability problem in the source finance export for that period, not a one-off typo. If any downstream reporting, dashboard, or covenant calculation reads the raw Gross Profit column directly instead of recomputing from Revenue and COGS, recent profitability has been understated on paper by roughly $60,000-$63,000/month. A controller should confirm which figures (stated or recomputed) actually reached the board, and tighten spreadsheet controls on the source financials file going forward.",
+      "dollar_impact_low": 185000.0,
+      "dollar_impact_high": 740000.0,
+      "confidence": "low",
+      "evidence": [
+        "normalization_issues: 'Dec-25: stated Gross Profit (162000.0) disagrees with Revenue-COGS (222416.76); using computed value' (diff $60,416.76)",
+        "normalization_issues: 'Jan-26: stated Gross Profit (167000.0) disagrees with Revenue-COGS (228790.0); using computed value' (diff $61,790)",
+        "normalization_issues: 'Feb-26: stated Gross Profit (170000.0) disagrees with Revenue-COGS (232900.0); using computed value' (diff $62,900)",
+        "normalization_issues: 'Nov-25: stated Gross Profit (210000.0) disagrees with Revenue-COGS (209749.0); using computed value' (immaterial, $251 gap)",
+        "normalization_issues: 'Nov-25: COGS was an unevaluated formula string (\"601000*0.651\")'; 'Dec-25: COGS was an unevaluated formula string (\"489000*0.668\")'",
+        "Observed 3-month total material discrepancy = $60,417+$61,790+$62,900 = $185,107; extrapolated to a full year at the same monthly rate = ~$740,000 if the source template is not fixed"
+      ]
+    }
+  ]
+}
