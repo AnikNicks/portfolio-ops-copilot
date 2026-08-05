@@ -9,3 +9,7 @@ venv/
 # Claude Code runtime/local artifacts - never shared, machine/session specific
 .claude/scheduled_tasks.lock
 .claude/settings.local.json
+
+# Execution/operational tracking - not portfolio content
+PROGRESS.md
+pipeline/run_history.db

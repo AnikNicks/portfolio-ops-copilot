@@ -4,9 +4,10 @@ Run once: python generate_financials.py
 Not part of the pipeline itself - pipeline/normalize.py consumes the output, not this script.
 """
 
+from pathlib import Path
+
 from openpyxl import Workbook
 from openpyxl.styles import Font
-from pathlib import Path
 
 OUT = Path(__file__).parent / "financials_raw.xlsx"
 
@@ -30,7 +31,8 @@ for c in ws[3]:
 # - Q3 (Dec-Feb) revenue is in USD, not CAD, unlabeled except in the "Notes" column
 # - two rows have COGS as a formula-looking string instead of a number (export artifact)
 # - one blank row in the middle (common in Excel exports)
-# - Gross Profit column sometimes pre-computed, sometimes not, and disagrees with Revenue-COGS in two rows (rounding/entry error - this IS the margin leakage signal)
+# - Gross Profit column sometimes pre-computed, sometimes not, and disagrees with Revenue-COGS
+#   in two rows (rounding/entry error - this IS the margin leakage signal)
 rows = [
     ["Mar-25", 612000, 398000, 214000, 165000, 49000, 41, ""],
     ["Apr-25", 598000, 389000, 209000, 168000, 41000, 44, ""],
@@ -49,7 +51,7 @@ rows = [
 for r in rows:
     ws.append(r)
 
-for col, width in zip("ABCDEFGH", [10, 12, 12, 13, 12, 11, 10, 22]):
+for col, width in zip("ABCDEFGH", [10, 12, 12, 13, 12, 11, 10, 22], strict=True):
     ws.column_dimensions[col].width = width
 
 wb.save(OUT)

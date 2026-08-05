@@ -1,0 +1,8 @@
+node_modules/
+dist/
+# Regenerated from ../output/*/action_memo.json by scripts/sync_data.py - not source.
+public/data/
+# tsc -b (composite project) build artifacts.
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts

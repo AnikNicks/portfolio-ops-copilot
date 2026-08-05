@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import re
 import sys
 from pathlib import Path
@@ -23,6 +24,8 @@ from pypdf import PdfReader
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SECTION_HEADING_RE = re.compile(r"^\d+\.\s+\S")
+
+logger = logging.getLogger(__name__)
 
 
 def contracts_dir(company: str) -> Path:
@@ -37,6 +40,7 @@ def list_contracts(company: str) -> list[str]:
 
 
 def extract_chunks(company: str, filename: str) -> list[dict]:
+    logger.info("extract_chunks: company=%r file=%r", company, filename)
     path = contracts_dir(company) / filename
     if not path.exists():
         raise FileNotFoundError(f"no such contract file: {path}")
@@ -55,11 +59,13 @@ def extract_chunks(company: str, filename: str) -> list[dict]:
     def flush():
         text = "\n".join(current_lines).strip()
         if text:
-            chunks.append({
-                "chunk_id": f"{filename}#{len(chunks)}",
-                "heading": current_heading,
-                "text": text,
-            })
+            chunks.append(
+                {
+                    "chunk_id": f"{filename}#{len(chunks)}",
+                    "heading": current_heading,
+                    "text": text,
+                }
+            )
 
     for line in lines:
         if SECTION_HEADING_RE.match(line.strip()):
@@ -70,6 +76,7 @@ def extract_chunks(company: str, filename: str) -> list[dict]:
             current_lines.append(line)
     flush()
 
+    logger.info("extract_chunks: produced %d chunk(s) from %s", len(chunks), filename)
     return chunks
 
 
@@ -78,7 +85,15 @@ def main() -> None:
     parser.add_argument("--company", required=True)
     parser.add_argument("--file", help="Contract PDF filename within the company's contracts/ dir")
     parser.add_argument("--list", action="store_true", help="List available contract files instead of extracting")
+    parser.add_argument("--verbose", action="store_true", help="Log INFO-level detail to stderr")
     args = parser.parse_args()
+
+    # Logging goes to stderr only - stdout stays the exact JSON payload downstream tools parse.
+    logging.basicConfig(
+        stream=sys.stderr,
+        level=logging.INFO if args.verbose else logging.WARNING,
+        format="%(levelname)s %(name)s: %(message)s",
+    )
 
     try:
         if args.list:

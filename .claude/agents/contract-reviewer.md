@@ -32,17 +32,24 @@ paraphrase from general knowledge of what freight or supply contracts "usually" 
    - **Auto-renewal traps**: renewal clauses with a narrow written-notice window, especially ones
      that also block renegotiation during the renewal term.
    - **Pricing escalators**: automatic price increases (fixed %, index-linked, or both) that raise
-     Acme's costs — note that an escalator only counts as a *risk* if Acme is the one paying more,
-     not the one charging more.
+     the company's costs — note that an escalator only counts as a *risk* if the company being
+     reviewed is the one paying more, not the one charging more.
    - **Termination risk**: restrictions on terminating for convenience, volume commitments that
      lock in spend.
+   - **Other material risk** (`clause_type: "other"`): any other clause that would matter to an
+     operating partner and doesn't fit the three categories above — e.g. exclusivity/non-compete
+     restrictions, uncapped liability or indemnification, one-sided assignment or change-of-control
+     terms. Don't force-fit a genuinely different risk into one of the first three categories just
+     because they're named first.
 3. For each clause risk, estimate an annual dollar impact range grounded in whatever numbers are
    available in the contract itself (rates, volume commitments, escalator percentages) or state
    explicitly that the estimate is directional because the contract doesn't include enough
    pricing detail to size it precisely.
 4. Write your output to `output/<company>/contract_risk_findings.json`, matching the
    `ContractRiskFindings` pydantic model in `pipeline/schemas.py` exactly. `quoted_text` in each
-   `ContractClauseRisk` must be a verbatim excerpt from the chunk you cited.
+   `ContractClauseRisk` must be a verbatim excerpt from the chunk you cited, and `chunk_id` must be
+   set to that exact chunk's id (e.g. `"vendor_contract_freight.pdf#4"`) — a real structured field,
+   not just a reference embedded in the `risk_summary` prose.
 
 ## Constraints
 

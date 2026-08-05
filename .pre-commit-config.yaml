@@ -1,0 +1,9 @@
+# Deliberately lint/format only, not pytest - the full test suite belongs in CI (see
+# .github/workflows/ci.yml), not blocking every local commit.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.1
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format

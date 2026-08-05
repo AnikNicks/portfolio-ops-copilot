@@ -8,6 +8,7 @@ itself lives entirely in .claude/agents/ and .claude/commands/, not in this file
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -19,6 +20,15 @@ import streamlit as st
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_ROOT / "data" / "synthetic"
 MEMOS_DIR = REPO_ROOT / "memos"
+
+# Set on the hosted demo deployment (e.g. Streamlit Community Cloud), which has no Claude Code
+# CLI or Docker MCP gateway available to actually run the pipeline. In demo mode the app only
+# ever shows the already-committed output/memos - it never shells out to `claude`.
+DEMO_MODE = os.environ.get("DEMO_MODE") == "1"
+
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from pipeline.run_history import all_runs, summary_by_company  # noqa: E402
 
 
 def slugify(name: str) -> str:
@@ -58,8 +68,7 @@ def describe_stream_event(raw_line: str) -> str | None:
                 inp = block.get("input", {}) or {}
                 if name in ("Agent", "Task"):
                     parts.append(
-                        f"-> dispatching subagent: {inp.get('subagent_type', '?')} "
-                        f"({inp.get('description', '')})"
+                        f"-> dispatching subagent: {inp.get('subagent_type', '?')} ({inp.get('description', '')})"
                     )
                 elif name == "Bash":
                     parts.append(f"-> bash: {str(inp.get('command', ''))[:100]}")
@@ -97,6 +106,15 @@ st.caption(
     "Powered by a Claude Code multi-agent pipeline (financial-analyst, data-quality-auditor, "
     "contract-reviewer, synthesis-writer) reading through a Docker MCP-scoped data room."
 )
+if DEMO_MODE:
+    st.info(
+        "**Demo mode** — this hosted instance shows pre-computed runs only. Streamlit Community "
+        "Cloud can't run the Claude Code CLI or the Docker MCP gateway, so live pipeline "
+        "invocation and file uploads are disabled here. Clone the repo and run "
+        "`streamlit run app/streamlit_app.py` locally (with Claude Code + Docker installed) to "
+        "watch it run for real — see the README.",
+        icon="ℹ️",
+    )
 
 companies = sorted(p.name for p in DATA_DIR.iterdir() if p.is_dir()) if DATA_DIR.exists() else []
 
@@ -109,51 +127,64 @@ with st.sidebar:
     )
 
     st.subheader("Upload files")
+    if DEMO_MODE:
+        st.caption("Uploads are disabled in demo mode.")
     target_mode = st.radio(
-        "Company", ["Add to existing", "Create new"], horizontal=True, disabled=not companies
+        "Company",
+        ["Add to existing", "Create new"],
+        horizontal=True,
+        disabled=DEMO_MODE or not companies,
     )
     if target_mode == "Add to existing" and companies:
         target_slug = st.selectbox("Existing company", companies, key="upload_target")
     else:
-        target_name = st.text_input("New company name", placeholder="e.g. Northwind Fabrication")
+        target_name = st.text_input("New company name", placeholder="e.g. Northwind Fabrication", disabled=DEMO_MODE)
         target_slug = slugify(target_name)
 
     up_financials = st.file_uploader(
-        "Financials export (.xlsx) — replaces the existing one", type=["xlsx"], key="up_fin"
+        "Financials export (.xlsx) — replaces the existing one",
+        type=["xlsx"],
+        key="up_fin",
+        disabled=DEMO_MODE,
     )
     up_crm = st.file_uploader(
-        "CRM / ERP export (.csv) — replaces the existing one", type=["csv"], key="up_crm"
+        "CRM / ERP export (.csv) — replaces the existing one", type=["csv"], key="up_crm", disabled=DEMO_MODE
     )
     up_contracts = st.file_uploader(
         "Contracts (.pdf) — added alongside existing ones",
         type=["pdf"],
         accept_multiple_files=True,
         key="up_contracts",
+        disabled=DEMO_MODE,
     )
 
-    if st.button("Save files"):
+    if st.button("Save files", disabled=DEMO_MODE):
         if not target_slug:
             st.error("Enter or select a company first.")
         elif not (up_financials or up_crm or up_contracts):
             st.error("Upload at least one file.")
         else:
-            company_dir = DATA_DIR / target_slug
-            company_dir.mkdir(parents=True, exist_ok=True)
-            saved = []
-            if up_financials is not None:
-                (company_dir / "financials_raw.xlsx").write_bytes(up_financials.getvalue())
-                saved.append("financials_raw.xlsx")
-            if up_crm is not None:
-                (company_dir / "crm_export.csv").write_bytes(up_crm.getvalue())
-                saved.append("crm_export.csv")
-            if up_contracts:
-                contracts_dir = company_dir / "contracts"
-                contracts_dir.mkdir(exist_ok=True)
-                for uploaded in up_contracts:
-                    (contracts_dir / uploaded.name).write_bytes(uploaded.getvalue())
-                    saved.append(f"contracts/{uploaded.name}")
-            st.success(f"Saved to '{target_slug}': {', '.join(saved)}")
-            st.rerun()
+            try:
+                company_dir = DATA_DIR / target_slug
+                company_dir.mkdir(parents=True, exist_ok=True)
+                saved = []
+                if up_financials is not None:
+                    (company_dir / "financials_raw.xlsx").write_bytes(up_financials.getvalue())
+                    saved.append("financials_raw.xlsx")
+                if up_crm is not None:
+                    (company_dir / "crm_export.csv").write_bytes(up_crm.getvalue())
+                    saved.append("crm_export.csv")
+                if up_contracts:
+                    contracts_dir = company_dir / "contracts"
+                    contracts_dir.mkdir(exist_ok=True)
+                    for uploaded in up_contracts:
+                        (contracts_dir / uploaded.name).write_bytes(uploaded.getvalue())
+                        saved.append(f"contracts/{uploaded.name}")
+            except OSError as exc:
+                st.error(f"Couldn't save files: {exc}")
+            else:
+                st.success(f"Saved to '{target_slug}': {', '.join(saved)}")
+                st.rerun()
 
     st.divider()
     st.subheader("Files in a company's data room")
@@ -174,18 +205,26 @@ with st.sidebar:
                 any_files = True
                 c1, c2 = st.columns([4, 1])
                 c1.text(label)
-                if c2.button("Remove", key=f"rm_{label}"):
-                    path.unlink()
-                    st.rerun()
+                if c2.button("Remove", key=f"rm_{label}", disabled=DEMO_MODE):
+                    try:
+                        path.unlink()
+                    except OSError as exc:
+                        st.error(f"Couldn't remove {label}: {exc}")
+                    else:
+                        st.rerun()
 
         if manage_contracts_dir.exists():
             for pdf in sorted(manage_contracts_dir.glob("*.pdf")):
                 any_files = True
                 c1, c2 = st.columns([4, 1])
                 c1.text(f"contracts/{pdf.name}")
-                if c2.button("Remove", key=f"rm_contract_{pdf.name}"):
-                    pdf.unlink()
-                    st.rerun()
+                if c2.button("Remove", key=f"rm_contract_{pdf.name}", disabled=DEMO_MODE):
+                    try:
+                        pdf.unlink()
+                    except OSError as exc:
+                        st.error(f"Couldn't remove {pdf.name}: {exc}")
+                    else:
+                        st.rerun()
 
         if not any_files:
             st.caption(f"No files yet for '{manage_slug}'.")
@@ -193,7 +232,7 @@ with st.sidebar:
         st.caption("No companies yet — upload files above to create the first one.")
 
 if not companies:
-    st.error(f"No portfolio companies yet — use the sidebar to add one.")
+    st.error("No portfolio companies yet — use the sidebar to add one.")
     st.stop()
 
 company = st.selectbox("Portfolio company", companies)
@@ -228,51 +267,74 @@ with col_before:
 with col_after:
     st.subheader("After — value-creation memo")
 
-    run_clicked = st.button("Run Diagnostic", type="primary")
+    if DEMO_MODE:
+        st.button("Run Diagnostic", type="primary", disabled=True, help="Disabled in demo mode.")
+        st.caption("Live pipeline runs are disabled in demo mode — showing the pre-computed memo below.")
+        run_clicked = False
+    else:
+        run_clicked = st.button("Run Diagnostic", type="primary")
 
     if run_clicked:
-        st.caption(f"Running `/diagnose {company}` — this dispatches 3 subagents in parallel "
-                   "then a synthesis pass, typically ~8-10 minutes total.")
+        st.caption(
+            f"Running `/diagnose {company}` — this dispatches 3 subagents in parallel "
+            "then a synthesis pass, typically ~8-10 minutes total."
+        )
         log_placeholder = st.empty()
         log_lines: list[str] = []
 
-        proc = subprocess.Popen(
-            [
-                "claude", "-p", f"/diagnose {company}",
-                "--permission-mode", "acceptEdits",
-                "--allowedTools",
-                "Task,Bash,Read,Write,mcp__MCP_DOCKER__read_file,mcp__MCP_DOCKER__list_directory",
-                "--output-format", "stream-json",
-                "--verbose",
-            ],
-            cwd=REPO_ROOT,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-        )
-        final_event_is_error = False
-        for raw_line in proc.stdout:  # type: ignore[union-attr]
-            raw_line = raw_line.rstrip("\n")
-            if not raw_line.strip():
-                continue
-            message = describe_stream_event(raw_line)
-            if message is None:
-                continue
-            # A "   ERROR" line is a single tool call failing mid-run (e.g. a subagent
-            # retrying a write after Claude Code's read-before-write guard) - the agent
-            # routinely recovers from these. Only the terminal `result` event's is_error
-            # flag (surfaced here as "FAILED") means the run actually didn't complete.
-            if message.startswith("FAILED"):
-                final_event_is_error = True
-            log_lines.append(message)
-            log_placeholder.code("\n".join(log_lines[-30:]), language=None)
-        returncode = proc.wait()
-
-        if returncode != 0 or final_event_is_error:
-            st.error("Pipeline run failed — see the log above for the last events before failure.")
+        try:
+            proc = subprocess.Popen(
+                [
+                    "claude",
+                    "-p",
+                    f"/diagnose {company}",
+                    "--permission-mode",
+                    "acceptEdits",
+                    "--allowedTools",
+                    "Task,Bash,Read,Write,mcp__MCP_DOCKER__read_file,mcp__MCP_DOCKER__list_directory",
+                    "--output-format",
+                    "stream-json",
+                    "--verbose",
+                ],
+                cwd=REPO_ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+            )
+        except (FileNotFoundError, OSError) as exc:
+            st.error(
+                f"Couldn't start the Claude Code CLI (`claude`): {exc}. Make sure Claude Code is installed and on PATH."
+            )
         else:
-            st.success("Diagnostic complete.")
+            final_event_is_error = False
+            try:
+                for raw_line in proc.stdout:  # type: ignore[union-attr]
+                    raw_line = raw_line.rstrip("\n")
+                    if not raw_line.strip():
+                        continue
+                    message = describe_stream_event(raw_line)
+                    if message is None:
+                        continue
+                    # A "   ERROR" line is a single tool call failing mid-run (e.g. a subagent
+                    # retrying a write after Claude Code's read-before-write guard) - the agent
+                    # routinely recovers from these. Only the terminal `result` event's is_error
+                    # flag (surfaced here as "FAILED") means the run actually didn't complete.
+                    if message.startswith("FAILED"):
+                        final_event_is_error = True
+                    log_lines.append(message)
+                    log_placeholder.code("\n".join(log_lines[-30:]), language=None)
+            finally:
+                # If reading stdout raised partway through, don't leave the CLI process
+                # running in the background - stop it and reap it either way.
+                if proc.poll() is None:
+                    proc.terminate()
+                returncode = proc.wait()
+
+            if returncode != 0 or final_event_is_error:
+                st.error("Pipeline run failed — see the log above for the last events before failure.")
+            else:
+                st.success("Diagnostic complete.")
 
     if memo_path.exists():
         # Streamlit's markdown treats $...$ as LaTeX, which mangles a memo full of dollar
@@ -280,10 +342,22 @@ with col_after:
         memo_text = memo_path.read_text(encoding="utf-8").replace("$", "\\$")
         st.markdown(memo_text)
     else:
-        st.info(
-            f"No memo yet for {company}. Click **Run Diagnostic** to generate "
-            f"{memo_path.relative_to(REPO_ROOT)}."
-        )
+        st.info(f"No memo yet for {company}. Click **Run Diagnostic** to generate {memo_path.relative_to(REPO_ROOT)}.")
+
+st.divider()
+with st.expander("Run history (SQL-backed observability)"):
+    st.caption(
+        "Every completed /diagnose run is recorded to pipeline/run_history.db via "
+        "pipeline/guardrails.py record-run - queryable with pipeline/query_runs.py or here."
+    )
+    summary_rows = summary_by_company()
+    if summary_rows:
+        st.markdown("**Per-company summary**")
+        st.dataframe(pd.DataFrame(summary_rows), use_container_width=True)
+        st.markdown("**Most recent runs**")
+        st.dataframe(pd.DataFrame(all_runs()).head(10), use_container_width=True)
+    else:
+        st.caption("No runs recorded yet — run `/diagnose <company>` at least once first.")
 
 st.divider()
 st.caption(

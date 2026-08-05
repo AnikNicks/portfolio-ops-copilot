@@ -1,0 +1,26 @@
+{
+  "name": "portfolio-ops-copilot-viewer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Static TypeScript/React companion viewer for the Portfolio Ops Copilot value-creation memos. Reads the same committed output/*/action_memo.json the Python pipeline produces - no backend, no live pipeline invocation.",
+  "scripts": {
+    "sync-data": "python scripts/sync_data.py",
+    "predev": "npm run sync-data",
+    "dev": "vite",
+    "prebuild": "npm run sync-data",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}
