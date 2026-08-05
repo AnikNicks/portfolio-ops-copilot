@@ -1,5 +1,7 @@
 # 📊 Portfolio Ops Copilot: Autonomous Multi-Agent Portfolio Diagnostics Engine
 
+[![CI](https://github.com/AnikNicks/portfolio-ops-copilot/actions/workflows/ci.yml/badge.svg)](https://github.com/AnikNicks/portfolio-ops-copilot/actions/workflows/ci.yml)
+
 An advanced, production-grade autonomous diagnostics and value-creation orchestration platform
 designed to convert a portfolio company's messy financial, CRM, and vendor-contract exports into a
 board-ready, dollar-quantified action plan. **Portfolio Ops Copilot** orchestrates a four-agent
@@ -13,6 +15,10 @@ tooling, Portfolio Ops Copilot eliminates spreadsheet fatigue — instantly tran
 unstructured financial, CRM, and contract noise into a fixed
 Problem→Solution→Trade-offs→Success-Metrics action plan with a dollar-impact estimate attached to
 every recommendation, gated end-to-end by code-enforced validation instead of prompt-only trust.
+The pipeline has been proven end to end against two independently-messy synthetic data rooms
+(`acme-distribution`, `northwind-fabrication`) — not hand-tuned to a single example — and is
+backed by an automated test suite (71 tests), a citation-grounding eval, and a green CI pipeline
+on every push.
 
 ---
 
@@ -46,6 +52,14 @@ every recommendation, gated end-to-end by code-enforced validation instead of pr
 * **Fail-Safe Regeneration Matrix:** The orchestrator clears stale output before every run so a
   no-read-tool agent's write never collides with the write-tool's overwrite-protection check —
   every diagnostic run is a clean, reproducible regeneration, never a stale partial merge.
+* **Automated Quality Gates:** A 71-test pytest suite covering every schema, guardrail, and
+  normalization edge case; an automated grounding eval that re-extracts every contract PDF fresh
+  and verifies every cited clause; and a GitHub Actions CI pipeline (lint + format-check + test)
+  required by branch protection before anything merges to `master`.
+* **Run History & Observability:** Every diagnostic run is logged to a local SQLite history
+  (company, grounding score, retry count, total dollar impact) — queryable via CLI or a "Run
+  History" expander in the Streamlit app — purely for observability, never a gate on the run
+  itself.
 
 ---
 
@@ -61,9 +75,18 @@ every recommendation, gated end-to-end by code-enforced validation instead of pr
 ### Guardrails & Reliability
 * **`pipeline/guardrails.py`** (Preflight Input Sanitization + Post-Output Validation CLI)
 * **Retry-Once-Then-Hard-Stop Policy** (Self-Correcting Agent Dispatch on Validation Failure)
+* **`evals/grounding_eval.py`** (Automated Citation-Grounding Verifier)
+* **SQLite `pipeline/run_history.py`** (Per-Run Observability Log)
+
+### Testing & CI
+* **pytest** (71-test suite: schemas, guardrails, normalization, contract extraction, run history)
+* **ruff** (Lint + Format, enforced both locally via pre-commit and in CI)
+* **GitHub Actions** (Lint → Format-Check → Test, required by branch protection on `master`)
 
 ### Frontend & App State
-* **Streamlit** (Before/After Diagnostic Visualization Console)
+* **Streamlit** (Before/After Diagnostic Visualization Console, with a `DEMO_MODE` read-only mode)
+* **Vite + React + TypeScript** (`viewer/` — a static, backend-free companion viewer for already-
+  generated memos)
 
 ---
 
@@ -158,6 +181,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+To run the test suite, lint, or pre-commit hooks locally, also install the dev extras:
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install   # optional: runs ruff on every commit
+```
+
 ### 4. Configure the Model Context Protocol Gateway
 
 `.mcp.json` is checked in, but it points at a Docker MCP **profile**
@@ -187,6 +217,10 @@ claude
 /diagnose acme-distribution
 ```
 
+Two synthetic data rooms ship with the repo — `acme-distribution` and `northwind-fabrication`
+(`data/synthetic/<company>/`) — proving the pipeline generalizes rather than being hand-tuned to
+one example. Run either the same way: `/diagnose northwind-fabrication`.
+
 ### 6. Launch the Visualization Console
 
 ```bash
@@ -198,6 +232,28 @@ streamlit run app/streamlit_app.py
 2. Review the raw data room in the **Before** panel.
 3. Click **Run Diagnostic** to stream the live multi-agent run, then review the generated
    value-creation memo in the **After** panel.
+4. Expand **Run History** to see every past run's grounding score, retry count, and total dollar
+   impact, pulled from the local SQLite log.
+
+Set `DEMO_MODE=1` to run the app read-only (uploads, file removal, and re-running a diagnostic are
+disabled; only already-committed output is browsable) — the mode this app runs in on a public
+hosted demo, so a visitor can't shell out to the `claude` CLI on the host.
+
+### 7. Run the Companion TypeScript Viewer (optional)
+
+A second, backend-free way to browse already-generated memos — a static Vite + React + TypeScript
+site that reads the same `output/<company>/action_memo.json` the Python pipeline writes, with no
+Python runtime or cold start:
+
+```bash
+cd viewer
+npm install
+npm run dev
+```
+
+It runs alongside the Streamlit app, not instead of it — Streamlit is the "watch it run" story
+(uploads, live `/diagnose` streaming); the viewer is the "read the results" story (fast, always
+warm, read-only by construction since it never invokes the pipeline).
 
 ---
 
@@ -219,6 +275,20 @@ orchestrator actually runs and branches on:
 This is a real, load-bearing gate rather than a formality — during an end-to-end run, it caught a
 specialist agent (deliberately scoped with no read access to the schema file) producing a
 differently-shaped JSON document, and forced a corrected retry before synthesis was allowed to run.
+
+Two more checks run alongside the schema gate, both re-derived from source on every run rather
+than cached or trusted from a prior pass:
+
+```bash
+# Re-extracts every contract PDF fresh and verifies every cited chunk_id/quoted_text is real
+python evals/grounding_eval.py --company acme-distribution   # GROUNDING_OK, 6/6 (100%)
+
+# Full test suite (schemas, guardrails, normalization, contract extraction, run history)
+pytest -q                                                     # 71 passed
+
+# Lint + format, the same checks CI runs and branch protection requires before merge
+ruff check . && ruff format --check .
+```
 
 ---
 
@@ -251,6 +321,18 @@ differently-shaped JSON document, and forced a corrected retry before synthesis 
 * **Correlation Target:** Confirms every finding carries a traceable Account ID in its evidence
   list rather than an unverifiable summary claim.
 
+### 4. AR Days & COGS Compression on a Second, Differently-Messy Data Room (`northwind-fabrication`)
+
+* **Signal Surface:** AR days climbing from 38 to 65 over a year (financial agent), cross-referenced
+  against CRM contact gaps on the same accounts; gross margin falling ~6.5 points as COGS rose,
+  correlated against an uncapped 6% annual price escalator with a broken termination
+  cross-reference on a raw-materials supply contract (contract-review agent).
+* **Correlation Target:** Proves the pipeline generalizes to a second data room with entirely
+  different underlying numbers and messiness patterns — not hand-tuned to `acme-distribution` —
+  while still producing traceable, retrieval-grounded cross-agent correlations. Grounding eval:
+  6/6 (100%). Estimated impact: $650,000–$850,000/year (AR days) and $560,000–$700,000/year
+  (COGS/EBITDA).
+
 ---
 
 ## 🔮 Future Enhancements
@@ -261,8 +343,9 @@ differently-shaped JSON document, and forced a corrected retry before synthesis 
   synthetic data room while keeping the same normalize-before-reasoning tool boundary.
 * **Automated Remediation Ticketing:** Auto-filing a ticket per ranked action item into an issue
   tracker, with the dollar-impact estimate and evidence carried into the ticket body.
-* **Guardrail Telemetry:** Structured logging of every guardrail pass/fail/retry across runs, to
-  quantify how often each agent needs a corrective retry over time.
+* **Live Hosted Demo:** `DEMO_MODE` and the static TypeScript viewer are both already built for
+  this — what's left is standing up the actual Streamlit Community Cloud + Vercel/Netlify
+  deployments.
 
 ---
 
