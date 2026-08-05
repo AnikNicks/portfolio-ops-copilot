@@ -58,6 +58,22 @@ class TestRealCommittedData:
         ActionMemo.model_validate_json(acme_action_memo_json)
 
 
+class TestRealCommittedNorthwindData:
+    """The second data room (northwind-fabrication) must validate against the same schemas."""
+
+    def test_financial_findings(self, northwind_financial_json):
+        FinancialFindings.model_validate_json(northwind_financial_json)
+
+    def test_data_quality_findings(self, northwind_data_quality_json):
+        DataQualityFindings.model_validate_json(northwind_data_quality_json)
+
+    def test_contract_risk_findings(self, northwind_contract_risk_json):
+        ContractRiskFindings.model_validate_json(northwind_contract_risk_json)
+
+    def test_action_memo(self, northwind_action_memo_json):
+        ActionMemo.model_validate_json(northwind_action_memo_json)
+
+
 class TestFinding:
     def test_valid(self):
         Finding(**_finding())
