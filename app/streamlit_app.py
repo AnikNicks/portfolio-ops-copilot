@@ -35,6 +35,20 @@ def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
 
 
+def _arrow_safe(df: pd.DataFrame) -> pd.DataFrame:
+    """Stringify object-dtype columns before st.dataframe().
+
+    The raw data rooms are deliberately messy (e.g. an uncomputed "601000*0.651" formula
+    string or a comma-formatted "894,000" sitting in what's otherwise a numeric column),
+    which leaves pandas with an object dtype pyarrow can't convert - st.dataframe's Arrow
+    serialization then throws even though the surrounding try/except never sees it.
+    """
+    df = df.copy()
+    object_cols = df.select_dtypes(include="object").columns
+    df[object_cols] = df[object_cols].astype(str)
+    return df
+
+
 def describe_stream_event(raw_line: str) -> str | None:
     """Turn one `claude --output-format stream-json` line into a short human-readable
     progress message, or None if it's not worth showing (thinking-token counters, rate-limit
@@ -249,14 +263,14 @@ with col_before:
         st.markdown("**financials_raw.xlsx**")
         try:
             df = pd.read_excel(financials_path, sheet_name=0, header=2).dropna(how="all")
-            st.dataframe(df, use_container_width=True, height=250)
+            st.dataframe(_arrow_safe(df), use_container_width=True, height=250)
         except Exception as exc:  # noqa: BLE001 - demo-grade preview, not a pipeline path
             st.warning(f"Couldn't preview spreadsheet: {exc}")
 
     crm_path = company_dir / "crm_export.csv"
     if crm_path.exists():
         st.markdown("**crm_export.csv**")
-        st.dataframe(pd.read_csv(crm_path), use_container_width=True, height=250)
+        st.dataframe(_arrow_safe(pd.read_csv(crm_path)), use_container_width=True, height=250)
 
     contracts_dir = company_dir / "contracts"
     if contracts_dir.exists():
