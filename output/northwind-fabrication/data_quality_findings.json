@@ -1,0 +1,57 @@
+{
+  "company": "northwind-fabrication",
+  "source_system": "CRM export (Account ID / Contact / Annual Revenue / Region / Last Activity column conventions, same export style as acme-distribution's data room)",
+  "record_count": 12,
+  "duplicate_count": 8,
+  "missing_field_rate_pct": 66.7,
+  "findings": [
+    {
+      "title": "Duplicate accounts from inconsistent casing/whitespace and split field population",
+      "description": "Four account pairs represent the same underlying company entered twice under different Account IDs: (N-2001) 'Halden Machine Works' vs (N-2002) 'halden machine works ' (trailing whitespace); (N-2005) 'Redbrook Assemblies' vs (N-2006) same name with Region formatted as 'Alberta' instead of 'AB'; (N-2007) 'Thistlewood Components' vs (N-2008) blank Company Name; (N-2009) 'Ashgrove Metalworks' vs (N-2010) 'ASHGROVE METALWORKS'. Each pair shares identical contact, email, revenue, and account owner, and differs only in casing/whitespace formatting or in which record retains the phone number, company name, or last-activity date. This double-counts revenue in territory/segment rollups and creates a risk of two reps independently working the same account. Assumption: each duplicate pair costs an estimated $2,500-$5,000/year in redundant rep outreach time, CRM admin cleanup, and double-counted revenue in rollups (based on ~2-4 hours/quarter of reconciliation work at a loaded rep/ops rate, plus forecast-accuracy risk), with the Thistlewood pair skewing slightly higher given the fully blank Company Name field on N-2008 makes it invisible to name-based search. Applied across 4 pairs: $11,000-$19,000/year.",
+      "dollar_impact_low": 11000,
+      "dollar_impact_high": 19000,
+      "confidence": "medium",
+      "evidence": ["N-2001", "N-2002", "N-2005", "N-2006", "N-2007", "N-2008", "N-2009", "N-2010"]
+    },
+    {
+      "title": "Missing revenue and contact-name fields block segmentation and outreach",
+      "description": "N-2003 (Carrow Precision Ltd) has contact, email, phone, region, and last-activity date populated but no Annual Revenue value, preventing accurate segmentation or prioritization of the account. N-2004 (Vantage Tooling Group) has email, phone, revenue ($138,000), region, and last-activity date but no named Contact, leaving the account owner without a known point of contact for renewal or expansion conversations. Assumption: each single-field gap of this kind carries roughly $1,000-$2,500/year of risk from mis-tiering, mis-forecasting, or delayed outreach while the owner re-discovers who to call. Applied across 2 records: $2,000-$5,000/year.",
+      "dollar_impact_low": 2000,
+      "dollar_impact_high": 5000,
+      "confidence": "medium",
+      "evidence": ["N-2003", "N-2004"]
+    },
+    {
+      "title": "Effectively orphaned account with three missing critical fields simultaneously",
+      "description": "N-2012 (Kestrel Industrial Supply) is missing Contact, Email, and Annual Revenue at the same time, leaving only a phone number and region on file. There is no named point of contact, no way to reach the account by email, and no revenue figure to support prioritization or forecasting -- the account is effectively invisible in any CRM view or report that isn't a raw phone-number lookup. Assumption: the compounding effect of three missing critical fields on one record carries materially higher risk than a single gap, estimated at $3,500-$6,500/year reflecting the real chance this account is dropped entirely from active management.",
+      "dollar_impact_low": 3500,
+      "dollar_impact_high": 6500,
+      "confidence": "low",
+      "evidence": ["N-2012"]
+    },
+    {
+      "title": "Stale account with no logged engagement in ~21 months risks silent churn",
+      "description": "N-2011 (Priory Fabrication Co) shows a Last Activity date of 2024-11-19 -- roughly 21 months before the current analysis date (2026-08-05) -- with no more recent touchpoint recorded, despite $88,000 in annual revenue attributed to the account. This is functionally equivalent to a missing/unreliable last-activity field: the account owner has no visibility into whether the relationship is still active. Assumption: a stale last-activity flag of this duration carries roughly a 5-15% annual risk of the account lapsing unnoticed before renewal or being lost to a competitor before the gap is caught, applied to the account's $88,000 revenue: $4,500-$13,000/year.",
+      "dollar_impact_low": 4500,
+      "dollar_impact_high": 13000,
+      "confidence": "low",
+      "evidence": ["N-2011"]
+    },
+    {
+      "title": "Region naming drift (abbreviation vs. full name) mis-segments territory reporting",
+      "description": "The Region field uses two-letter provincial codes throughout the file (ON, BC, MB) except for the Redbrook Assemblies duplicate pair, where N-2005 uses 'AB' and N-2006 uses 'Alberta' for what is the same account. Any region-keyed territory or segment report that groups by exact string match will split this account's revenue into two separate buckets. Assumption: this single instance costs roughly $500-$1,500/year in analyst time reconciling region-based reports and minor territory misallocation risk.",
+      "dollar_impact_low": 500,
+      "dollar_impact_high": 1500,
+      "confidence": "low",
+      "evidence": ["N-2005", "N-2006"]
+    },
+    {
+      "title": "Company-name casing/whitespace inconsistency creates ongoing duplicate-creation risk",
+      "description": "Company Name values are inconsistently cased and whitespace-padded across the file ('halden machine works ' vs 'Halden Machine Works'; 'ASHGROVE METALWORKS' vs 'Ashgrove Metalworks'). This is the likely root cause of the Halden and Ashgrove duplicate-account findings above: any exact-match dedup logic in the CRM or downstream BI tools will fail to catch these as the same company, and the pattern will keep generating new duplicates as reps re-enter accounts without a standardized name field. Assumption: absent name normalization (trim + consistent casing) enforced at data entry, at least one additional undetected duplicate account is likely to be created per year, estimated at $1,000-$3,000/year using the lower end of the per-duplicate cost observed above.",
+      "dollar_impact_low": 1000,
+      "dollar_impact_high": 3000,
+      "confidence": "low",
+      "evidence": ["N-2001", "N-2002", "N-2009", "N-2010"]
+    }
+  ]
+}

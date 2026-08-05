@@ -35,3 +35,28 @@ def acme_contract_risk_json(acme_output_dir: Path) -> str:
 @pytest.fixture
 def acme_action_memo_json(acme_output_dir: Path) -> str:
     return (acme_output_dir / "action_memo.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
+def northwind_output_dir() -> Path:
+    return REPO_ROOT / "output" / "northwind-fabrication"
+
+
+@pytest.fixture
+def northwind_financial_json(northwind_output_dir: Path) -> str:
+    return (northwind_output_dir / "financial_findings.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
+def northwind_data_quality_json(northwind_output_dir: Path) -> str:
+    return (northwind_output_dir / "data_quality_findings.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
+def northwind_contract_risk_json(northwind_output_dir: Path) -> str:
+    return (northwind_output_dir / "contract_risk_findings.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
+def northwind_action_memo_json(northwind_output_dir: Path) -> str:
+    return (northwind_output_dir / "action_memo.json").read_text(encoding="utf-8")
