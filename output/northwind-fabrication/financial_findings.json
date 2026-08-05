@@ -1,0 +1,64 @@
+{
+  "company": "northwind-fabrication",
+  "period_covered": "Jan-25 to Dec-25",
+  "revenue": 11946300.0,
+  "gross_margin_pct": 27.09,
+  "findings": [
+    {
+      "title": "Gross margin erosion from rising COGS ratio, tied to new subcontractor onboarding",
+      "description": "Gross margin declined nearly every month of 2025, from 30.18% in Jan-25 to 23.62% in Dec-25 (-6.56pp). This is not opex-driven: opex as a % of revenue held roughly steady (18.34% Jan-25 to 19.15% Dec-25), while COGS as a % of revenue climbed sharply, from 69.82% (Jan-25) to 76.38% (Dec-25). The Aug-25 normalization_issues note flags a new subcontractor as the driver of the elevated COGS ratio starting that month, and the ratio kept climbing every month after (73.84% Aug-25 through 76.38% Dec-25), suggesting the subcontractor's cost structure (or a pricing concession that let it in) has not been renegotiated. Comparing the Jan-May-25 average COGS ratio (70.41%) to the Aug-Dec-25 average (75.09%) implies a 4.68pp permanent step-up in COGS as a share of revenue.",
+      "dollar_impact_low": 480000.0,
+      "dollar_impact_high": 550000.0,
+      "confidence": "medium",
+      "evidence": [
+        "Jan-25 gross_margin_pct 30.18 vs Dec-25 gross_margin_pct 23.62 (-6.56pp over 11 months, declining nearly every month in between)",
+        "COGS/revenue ratio: Jan-25 69.82% (cogs_cad 590000 / revenue_cad 845000) rising to Dec-25 76.38% (cogs_cad 718000 / revenue_cad 940000)",
+        "Jan-25 to May-25 average COGS ratio 70.41% vs Aug-25 to Dec-25 average COGS ratio 75.09% (+4.68pp step-up)",
+        "Aug-25 normalization_issues / source_notes: 'COGS ratio elevated - new subcontractor'",
+        "Opex/revenue ratio stable across the period (18.34% Jan-25 to 19.15% Dec-25), isolating the margin decline to COGS rather than opex",
+        "Applying the 4.68pp COGS-ratio step-up to annualized Dec-25 revenue ($940,000 x 12 = $11,280,000) implies roughly $528,000/year of margin given up versus the Jan-May-25 run rate"
+      ]
+    },
+    {
+      "title": "AR days climbing steadily and accelerating, trapping incremental cash in receivables",
+      "description": "ar_days rose almost every month of 2025, from 38 days in Jan-25 to 65 days in Dec-25, a 27-day increase. The pace is not just steady but accelerating into year-end: +3 days Oct-to-Nov (58 to 61) and +4 days Nov-to-Dec (61 to 65), and the Dec-25 source data explicitly flags this ('AR aging up sharply'). Applying the 27-day increase in collection cycle to the Dec-25 revenue run rate implies roughly $800K-$850K of cash that would otherwise be available for debt paydown or reinvestment is now sitting in receivables instead of being collected at the Jan-25 pace. This is a working-capital/cash-flow drag rather than a P&L hit, but it directly constrains liquidity and, if financed via a revolver, carries a real annual carrying cost.",
+      "dollar_impact_low": 650000.0,
+      "dollar_impact_high": 850000.0,
+      "confidence": "medium",
+      "evidence": [
+        "ar_days: Jan-25 = 38, Feb-25 = 40, Mar-25 = 42, Apr-25 = 44, May-25 = 45, Jun-25 = 47, Jul-25 = 49, Aug-25 = 52, Sep-25 = 55, Oct-25 = 58, Nov-25 = 61, Dec-25 = 65 (monotonic increase every month, 38 to 65 = +27 days)",
+        "Dec-25 source_notes: 'AR aging up sharply'",
+        "Acceleration in final two months: +3 days Oct-25 to Nov-25, +4 days Nov-25 to Dec-25, versus +1 to +2 days/month for most of the year",
+        "27-day AR increase x Dec-25 daily revenue run rate (revenue_cad 940000 / ~30.4 days = ~$30,900/day) implies ~$834,000 of incremental cash tied up in receivables versus the Jan-25 collection pace"
+      ]
+    },
+    {
+      "title": "EBITDA margin compression despite revenue growth - profitability inflection point",
+      "description": "Revenue grew modestly across 2025 (from $845,000 in Jan-25 to $940,000 in Dec-25, +11%, excluding the Jun-Jul GBP-converted spike), but EBITDA fell in dollar terms every single month from Aug-25 onward and moved from an 11.83% margin in Jan-25 to a 4.47% margin in Dec-25 - more than a 60% relative decline in profitability rate. This is the bottom-line expression of the COGS-driven margin leakage identified above, compounded slightly by a modest rise in the opex ratio; growth in volume is not offsetting the unit-economics erosion. On the current trajectory, if COGS ratio keeps climbing at its recent pace, the business could approach EBITDA breakeven within roughly 6-9 months without margin remediation.",
+      "dollar_impact_low": 560000.0,
+      "dollar_impact_high": 700000.0,
+      "confidence": "medium",
+      "evidence": [
+        "EBITDA margin: Jan-25 11.83% (ebitda_cad 100000 / revenue_cad 845000) vs Dec-25 4.47% (ebitda_cad 42000 / revenue_cad 940000)",
+        "Monthly EBITDA dollars fell from $100,000 (Jan-25) to $42,000 (Dec-25) even as revenue grew from $845,000 to $940,000",
+        "EBITDA declined every month from Aug-25 to Dec-25: ebitda_cad = 64000, 60000, 53000, 49000, 42000",
+        "Annualizing the Jan-25 EBITDA run rate ($100,000 x 12 = $1,200,000) versus the Dec-25 run rate ($42,000 x 12 = $504,000) implies a $696,000 decline in annualized EBITDA",
+        "Comparing Jan-25 to May-25 average EBITDA margin (10.90%) to Aug-25 to Dec-25 average (5.88%), a 5.01pp gap, applied to annualized Dec-25 revenue ($11,280,000) implies roughly $565,000/year of lost EBITDA at the current run rate"
+      ]
+    },
+    {
+      "title": "GBP-denominated UK export order creates FX exposure and an unreconciled gross-profit discrepancy (Jun-Jul 2025)",
+      "description": "Jun-25 and Jul-25 revenue and COGS were reported in GBP per the source Notes column and converted to CAD at a single rate of 1.74 by the normalizer, meaning ~$3.12M of CAD-equivalent revenue for those two months ($1,555,560 + $1,567,740) is exposed to GBP/CAD movement that isn't being hedged or actively managed as far as the data shows. Separately and more urgently for a controller: in both months, the source spreadsheet's stated Gross Profit figure disagreed materially with Revenue-minus-COGS (by $184,260 in Jun-25 and $176,860 in Jul-25, $361,120 combined); the normalizer defaulted to the computed value, but this discrepancy was never explained in the source data and should be reconciled against the underlying UK order ledger, since it suggests either a bookkeeping error or an uncaptured adjustment (returns, rebates, freight) whose true treatment is unknown.",
+      "dollar_impact_low": 150000.0,
+      "dollar_impact_high": 360000.0,
+      "confidence": "low",
+      "evidence": [
+        "Jun-25 normalization_issues: 'figures reported in GBP per Notes column; converted to CAD at 1.74'; Jul-25 normalization_issues: same note",
+        "Jun-25 revenue_cad 1555560.0 and Jul-25 revenue_cad 1567740.0 ($3,123,300 combined) are GBP-sourced and exposed to GBP/CAD rate risk at a single fixed conversion rate",
+        "Jun-25 normalization_issues: stated Gross Profit (249000.0) disagrees with Revenue-COGS (433260.0) by $184,260; using computed value",
+        "Jul-25 normalization_issues: stated Gross Profit (239000.0) disagrees with Revenue-COGS (415860.0) by $176,860; using computed value",
+        "A plausible +/-5% GBP/CAD rate move on the $3,123,300 GBP-sourced CAD-equivalent revenue implies roughly $156,000 of FX sensitivity; combined with the $361,120 unreconciled gross-profit discrepancy, total exposure/uncertainty spans roughly $150,000-$360,000"
+      ]
+    }
+  ]
+}

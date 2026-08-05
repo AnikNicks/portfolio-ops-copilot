@@ -1,0 +1,63 @@
+{
+  "company": "northwind-fabrication",
+  "contracts_reviewed": [
+    "component_supply_agreement.pdf",
+    "equipment_maintenance_agreement.pdf"
+  ],
+  "clause_risks": [
+    {
+      "contract_file": "component_supply_agreement.pdf",
+      "clause_type": "pricing_escalator",
+      "quoted_text": "Base\nPrices shall automatically increase by six percent (6%), applied without further notice to or consent from\nCustomer",
+      "risk_summary": "Section 3 imposes an automatic 6% annual increase on Base Prices Northwind pays Aldergate Metals for raw steel and aluminum stock, applied without any further notice to or consent from Northwind (i.e. Northwind is the party paying more, so this is a genuine cost-side escalator risk, not a revenue-side one). The increase compounds on every anniversary and there is no cap. The extracted contract text does not include Schedule A unit prices or annual purchase volume, so this estimate is directional: assuming a small-to-mid-size fabricator's annual purchase volume from a single primary steel/aluminum supplier in the range of roughly $250,000-$1,500,000/year (not stated in the contract), a 6% increase would add approximately $15,000-$90,000 in incremental cost in the first affected year alone, growing further with each subsequent compounding renewal.",
+      "chunk_id": "component_supply_agreement.pdf#3",
+      "dollar_impact_low": 15000,
+      "dollar_impact_high": 90000
+    },
+    {
+      "contract_file": "component_supply_agreement.pdf",
+      "clause_type": "auto_renewal",
+      "quoted_text": "This Agreement has an initial term of two (2) years from the Effective Date and shall renew\nautomatically for successive one (1) year terms unless either Party gives at least forty-five (45) days'\nwritten notice of non-renewal prior to the end of the then-current term.",
+      "risk_summary": "After the 2-year initial term, the agreement auto-renews for successive 1-year terms unless Northwind gives written notice of non-renewal at least 45 days before the then-current term ends -- a narrow window that must be tracked annually rather than negotiated once. Missing it locks Northwind into another full year of supply at whatever the then-current (already 6%-escalated per Section 3) Base Prices are, with no renegotiation mechanism described in the contract. Directional estimate, since Schedule A pricing/volume is not in the extracted text: missing the notice window effectively forces acceptance of one additional year of the Section 3 escalator, sized here at the same order of magnitude as that clause ($15,000-$90,000) rather than as a separate, additive cost.",
+      "chunk_id": "component_supply_agreement.pdf#5",
+      "dollar_impact_low": 15000,
+      "dollar_impact_high": 90000
+    },
+    {
+      "contract_file": "component_supply_agreement.pdf",
+      "clause_type": "other",
+      "quoted_text": "unless Customer terminates this Agreement in accordance with Section 6 at least forty-five\n(45) days prior to the applicable anniversary date",
+      "risk_summary": "Section 3's escalator clause states Northwind can avoid the 6% price increase only by 'terminating this Agreement in accordance with Section 6' -- but Section 6 of this contract is the Warranty clause (chunk #6, 'Supplier warrants that all Products will conform to the specifications...'), not a termination provision. The only actual exit/notice mechanism in the document is the non-renewal notice in Section 5 (Renewal). This broken cross-reference creates real legal ambiguity about whether Northwind has any valid, enforceable way to stop the automatic price increase short of non-renewing the entire supply relationship at the next anniversary, and could be read by Aldergate Metals as leaving Northwind with no contractual escape from the escalator at all within a given term. Directional estimate: if the ambiguity is resolved against Northwind (i.e., no clean way to block the increase mid-term), exposure is at least one to two compounding 6% cycles before the issue can be renegotiated or the contract allowed to lapse, roughly $30,000-$150,000 cumulative based on the same unconfirmed purchase-volume assumption used for the Section 3 finding.",
+      "chunk_id": "component_supply_agreement.pdf#3",
+      "dollar_impact_low": 30000,
+      "dollar_impact_high": 150000
+    },
+    {
+      "contract_file": "equipment_maintenance_agreement.pdf",
+      "clause_type": "other",
+      "quoted_text": "During the Initial Term and any Renewal Term, Customer shall not engage any other provider to\nperform maintenance, repair, or calibration services on the equipment listed in Schedule A, and shall\nrefer all such service needs to Provider in the first instance, regardless of Provider's response time or\npricing on any given call.",
+      "risk_summary": "Section 4 is an exclusivity/vendor lock-in clause: for the full Initial Term and any Renewal Term, Northwind cannot use any other provider for maintenance, repair, or calibration on the listed CNC and stamping equipment, and must go to Precision Machine Services first 'regardless of Provider's response time or pricing on any given call.' This removes Northwind's ability to competitively bid or switch to a faster/cheaper vendor even if Precision underperforms. The extracted text does not disclose the maintenance contract's dollar value or Schedule A equipment list value, so this is directional: assuming a typical annual CNC/stamping maintenance spend of roughly $50,000-$150,000 for a mid-size fabricator (not stated in the contract), being locked out of competitive bidding could plausibly cost 10-20% above a competitive market rate, or about $5,000-$30,000/year.",
+      "chunk_id": "equipment_maintenance_agreement.pdf#4",
+      "dollar_impact_low": 5000,
+      "dollar_impact_high": 30000
+    },
+    {
+      "contract_file": "equipment_maintenance_agreement.pdf",
+      "clause_type": "other",
+      "quoted_text": "Provider shall use commercially reasonable efforts to respond to emergency service requests within\nforty-eight (48) hours, but response time is not guaranteed and no service-level credit is payable for a\nmissed response window.",
+      "risk_summary": "Section 5 sets only a best-efforts, non-guaranteed 48-hour emergency response target with explicitly no service-level credit for a missed window. Combined with the Section 4 exclusivity clause that bars Northwind from calling another provider regardless of response time, Northwind has no contractual recourse if CNC or stamping equipment sits unresolved beyond 48 hours, exposing production to unplanned downtime with no compensating remedy. The contract does not include production volume, downtime cost, or equipment value figures, so this is a directional estimate of potential annual downtime-related exposure from a single missed/slow emergency response, not a precisely sized figure.",
+      "chunk_id": "equipment_maintenance_agreement.pdf#5",
+      "dollar_impact_low": 10000,
+      "dollar_impact_high": 60000
+    },
+    {
+      "contract_file": "equipment_maintenance_agreement.pdf",
+      "clause_type": "termination",
+      "quoted_text": "Neither Party may terminate this Agreement for convenience during the Initial Term. Following the\nInitial Term, either Party may terminate on ninety (90) days' written notice.",
+      "risk_summary": "Section 6 bars either party from terminating for convenience during the entire 24-month Initial Term; only after the Initial Term expires can either side exit, and even then only on 90 days' written notice. Paired with the Section 4 exclusivity clause, this means Northwind is contractually committed to Precision Machine Services for the full two years with no early-exit option, regardless of service quality, missed response windows (Section 5), or the availability of better-priced alternatives. Directional estimate, since no maintenance contract value is disclosed in the extracted text: sized as the potential switching-cost/overpayment exposure if a materially better-priced or more responsive alternative provider becomes available during the Initial Term but cannot be engaged due to this restriction.",
+      "chunk_id": "equipment_maintenance_agreement.pdf#6",
+      "dollar_impact_low": 10000,
+      "dollar_impact_high": 50000
+    }
+  ]
+}

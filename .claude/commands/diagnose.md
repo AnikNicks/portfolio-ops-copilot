@@ -70,6 +70,13 @@ validation, not a formality):
    `memos/$ARGUMENTS_value_creation_memo.md` exists: print a short summary — how many action
    items were generated, the total dollar-impact range across all of them, and the path to the
    final memo.
+7. Record the run for observability: run
+   `python pipeline/guardrails.py record-run --company $ARGUMENTS --retries <N>` via Bash, where
+   `<N>` is the total number of subagent retries this run needed across steps 3 and 5 (0 if none).
+   This computes and stores the grounding score and total dollar-impact range in
+   `pipeline/run_history.db` for later querying (`python pipeline/query_runs.py --summary`) — it is
+   observability, not a gate: if it prints `RUN_RECORD_FAILED`, note it in your summary but do not
+   retry it or treat the overall `/diagnose` run as failed because of it.
 
 If your own turn would otherwise end before all four subagents (three specialists +
 synthesis-writer) have confirmed completion *and* passed their guardrail validation, that is a

@@ -1,11 +1,15 @@
-# Core pipeline + app
-pandas>=3.0
-streamlit>=1.60
-pydantic>=2.13
-pypdf>=6.14
+# Core pipeline + app - pinned exactly (not >=) so CI, local dev, and a fresh clone all resolve
+# to the same versions this project was built and tested against. Verified on Python 3.12.10.
+pandas==3.0.5
+streamlit==1.60.0
+pydantic==2.13.4
+pypdf==6.14.2
 
-# Only used by the one-off synthetic-data generator scripts under
-# data/synthetic/<company>/ (generate_financials.py, contracts/generate_contracts.py) -
-# not required to run the pipeline or the app itself.
-openpyxl>=3.1
-reportlab>=5.0
+# openpyxl is required at runtime, not just by the one-off synthetic-data generator scripts under
+# data/synthetic/<company>/ - pandas needs it as the .xlsx engine for both normalize.py and
+# app/streamlit_app.py's "Before" panel (pd.read_excel).
+openpyxl==3.1.5
+
+# reportlab is only used by data/synthetic/<company>/contracts/generate_contracts.py to build the
+# synthetic contract PDFs - not needed to run the pipeline or the app.
+reportlab==5.0.0
