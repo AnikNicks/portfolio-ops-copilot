@@ -20,6 +20,10 @@ The pipeline has been proven end to end against two independently-messy syntheti
 backed by an automated test suite (71 tests), a citation-grounding eval, and a green CI pipeline
 on every push.
 
+**Live demo:** [portfolio-ops-copilot.streamlit.app](https://portfolio-ops-copilot.streamlit.app/)
+(full app in `DEMO_MODE` — pre-computed runs, uploads disabled) · [portfolio-ops-copilot.vercel.app](https://portfolio-ops-copilot.vercel.app/)
+(static companion viewer for the generated memos)
+
 ---
 
 ## 📸 Screenshots
@@ -343,9 +347,6 @@ ruff check . && ruff format --check .
   synthetic data room while keeping the same normalize-before-reasoning tool boundary.
 * **Automated Remediation Ticketing:** Auto-filing a ticket per ranked action item into an issue
   tracker, with the dollar-impact estimate and evidence carried into the ticket body.
-* **Live Hosted Demo:** `DEMO_MODE` and the static TypeScript viewer are both already built for
-  this — what's left is standing up the actual Streamlit Community Cloud + Vercel/Netlify
-  deployments.
 
 ---
 
