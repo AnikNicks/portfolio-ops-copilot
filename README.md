@@ -177,6 +177,21 @@ green required `test` check before merge, enforced by branch protection on `mast
 | ![Cross-agent correlation](docs/screenshots/02-memo-cross-agent-correlation.jpg) | ![Trade-offs and success metrics](docs/screenshots/03-memo-tradeoffs-success-metrics.jpg) |
 | *Synthesis agent tying an independently-flagged financial trend to a contract clause.* | *Every action item enforces Problem → Solution → Trade-offs → Success Metrics.* |
 
+| Retrieval-Grounded Contract Citation | Generalizes to a Second Data Room |
+|:---:|:---:|
+| ![Retrieval-grounded citation](docs/screenshots/08-retrieval-grounded-citation.jpg) | ![Second data room, northwind-fabrication](docs/screenshots/07-second-data-room-northwind.jpg) |
+| *A dollar claim traced inline to `component_supply_agreement.pdf` — the citation is a real filename, not a paraphrase.* | *`northwind-fabrication`: an independently-messy second data room (duplicate CRM rows, comma-formatted numbers), not a hand-tuned demo.* |
+
+| Run History & Observability | Automated Test Suite |
+|:---:|:---:|
+| ![Run history SQL-backed observability](docs/screenshots/09-run-history-observability.jpg) | ![pytest 71 passed](docs/screenshots/10-pytest-suite.png) |
+| *Every `/diagnose` run logged to SQLite — company, grounding score, retry count, dollar impact — queryable via CLI or in-app.* | *71 tests across schemas, guardrails, normalization, and contract extraction — the same suite CI runs on every push.* |
+
+| Automated Citation-Grounding Eval | Branch Protection Enforcing CI |
+|:---:|:---:|
+| ![Grounding eval GROUNDING_OK](docs/screenshots/11-grounding-eval.png) | ![GitHub branch protection requiring the test check](docs/screenshots/12-branch-protection.png) |
+| *Re-extracts every contract PDF fresh and verifies every cited clause is real — 6/6 grounded, not a cached or trusted result.* | *`master` requires the `test` GitHub Actions check, strict/up-to-date mode — merging without green CI isn't possible, not just discouraged.* |
+
 ---
 
 ## 💻 Installation
