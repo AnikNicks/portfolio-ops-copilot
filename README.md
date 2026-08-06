@@ -33,6 +33,31 @@ on every push.
 
 ---
 
+## 🌐 Live Demo & Deployment
+
+Both halves of the app are deployed and publicly reachable — not just runnable locally. Screenshots
+below are of the actual hosted instances, not the local dev server.
+
+### Hosted Streamlit App (Streamlit Community Cloud, `DEMO_MODE`)
+![Live Streamlit demo](docs/screenshots/04-live-streamlit-demo.jpg)
+*Deployed straight from `master`; `DEMO_MODE=1` disables uploads and live pipeline invocation
+since the hosted container has no Claude Code CLI or Docker MCP gateway — it serves the
+already-committed output for both data rooms instead.*
+
+### Static Companion Viewer (Vercel)
+![Live Vercel viewer](docs/screenshots/05-live-vercel-viewer.jpg)
+*A second, independent deployment of the Vite/React/TypeScript viewer — reads the same committed
+`action_memo.json` the Python pipeline writes, with no backend and no cold start.*
+
+### CI/CD in Production
+![CI/CD pipeline runs](docs/screenshots/06-cicd-pipeline.jpg)
+*Real merged history, not a demo pipeline: every PR (including two deploy-time bugs found and
+fixed live — an unpinned transitive `starlette` dependency and a `pyarrow` Arrow-serialization
+crash — see [Engineering Notes](#-engineering-notes-shipping-to-production) below) went through a
+green required `test` check before merge, enforced by branch protection on `master`.*
+
+---
+
 ## ⚡ Core Features
 
 * **Multi-Agent Diagnostic Pipeline:** Dispatches three specialist agents in parallel against a
@@ -336,6 +361,38 @@ ruff check . && ruff format --check .
   while still producing traceable, retrieval-grounded cross-agent correlations. Grounding eval:
   6/6 (100%). Estimated impact: $650,000–$850,000/year (AR days) and $560,000–$700,000/year
   (COGS/EBITDA).
+
+---
+
+## 🛠️ Engineering Notes: Shipping to Production
+
+Getting to a live, publicly-reachable deployment surfaced two real bugs that never showed up in
+local development or CI — both root-caused, fixed, and shipped through the same PR + required-
+CI-check workflow as every other change in this repo, not patched ad hoc:
+
+* **Unpinned transitive dependency broke the hosted runtime.** `requirements.txt` pinned
+  `streamlit` exactly but not its `starlette` dependency. Every Streamlit Community Cloud deploy
+  installs fresh, so it resolved a newer `starlette` release with a breaking `GZipResponder`
+  signature change that `streamlit==1.60.0` calls incorrectly — `TypeError` on startup. Invisible
+  locally because an older, compatible `starlette` was already installed from earlier work. Fixed
+  by pinning `starlette==1.3.1` explicitly ([PR #4](https://github.com/AnikNicks/portfolio-ops-copilot/pull/4)).
+* **A silent Arrow-serialization crash, found by reading the production logs after deploy.**
+  Rebooting the app after the fix above surfaced a second, unrelated failure: `st.dataframe()`
+  was throwing `pyarrow.lib.ArrowInvalid` on every page load. Root cause: the raw data rooms are
+  *deliberately* messy (an uncomputed `"601000*0.651"` formula string sitting in a COGS column,
+  a comma-formatted `"894,000"` in a Revenue column), which pandas parses as `object` dtype —
+  something Streamlit's Arrow serializer can't convert, and something the existing `try/except`
+  around the call never caught, because the failure happens inside Streamlit's own serialization
+  path, not the wrapped script code. Reproduced deterministically with `pa.Table.from_pandas()`
+  before writing the fix, verified clean against both data rooms' raw exports after
+  ([PR #5](https://github.com/AnikNicks/portfolio-ops-copilot/pull/5)).
+
+The common thread: neither bug was catchable by the test suite or CI as they existed — both only
+appear when a fresh environment resolves dependencies for real, or when Arrow serialization runs
+against actual messy data at render time. Both are now regression-proof in the sense that matters
+for this repo — pinned, fixed, and merged behind a green required check — but the honest lesson is
+that "tests pass, CI is green" and "the deployed app actually works" are different claims, and only
+one of them is provable without deploying.
 
 ---
 
