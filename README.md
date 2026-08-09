@@ -29,7 +29,7 @@ on every push.
 ## 📸 Screenshots
 
 ### Before / After Diagnostic Workspace
-![Before/after overview](docs/screenshots/01-before-after-overview.jpg)
+<p align="center"><img src="docs/screenshots/01-before-after-overview.jpg" width="800" alt="Before/after overview"></p>
 
 ---
 
@@ -39,18 +39,21 @@ Both halves of the app are deployed and publicly reachable — not just runnable
 below are of the actual hosted instances, not the local dev server.
 
 ### Hosted Streamlit App (Streamlit Community Cloud, `DEMO_MODE`)
-![Live Streamlit demo](docs/screenshots/04-live-streamlit-demo.jpg)
+<p align="center"><img src="docs/screenshots/04-live-streamlit-demo.jpg" width="800" alt="Live Streamlit demo"></p>
+
 *Deployed straight from `master`; `DEMO_MODE=1` disables uploads and live pipeline invocation
 since the hosted container has no Claude Code CLI or Docker MCP gateway — it serves the
 already-committed output for both data rooms instead.*
 
 ### Static Companion Viewer (Vercel)
-![Live Vercel viewer](docs/screenshots/05-live-vercel-viewer.jpg)
+<p align="center"><img src="docs/screenshots/05-live-vercel-viewer.jpg" width="800" alt="Live Vercel viewer"></p>
+
 *A second, independent deployment of the Vite/React/TypeScript viewer — reads the same committed
 `action_memo.json` the Python pipeline writes, with no backend and no cold start.*
 
 ### CI/CD in Production
-![CI/CD pipeline runs](docs/screenshots/06-cicd-pipeline.jpg)
+<p align="center"><img src="docs/screenshots/06-cicd-pipeline.jpg" width="800" alt="CI/CD pipeline runs"></p>
+
 *Real merged history, not a demo pipeline: every PR (including two deploy-time bugs found and
 fixed live — an unpinned transitive `starlette` dependency and a `pyarrow` Arrow-serialization
 crash — see [Engineering Notes](#-engineering-notes-shipping-to-production) below) went through a
@@ -121,7 +124,7 @@ green required `test` check before merge, enforced by branch protection on `mast
 
 ## 📐 Project Architecture
 
-![System architecture diagram](docs/screenshots/13-system-architecture-diagram.png)
+<p align="center"><img src="docs/screenshots/13-system-architecture-diagram.png" width="600" alt="System architecture diagram"></p>
 
 ---
 
@@ -129,22 +132,22 @@ green required `test` check before merge, enforced by branch protection on `mast
 
 | Cross-Agent Correlation | Fixed Memo Format |
 |:---:|:---:|
-| ![Cross-agent correlation](docs/screenshots/02-memo-cross-agent-correlation.jpg) | ![Trade-offs and success metrics](docs/screenshots/03-memo-tradeoffs-success-metrics.jpg) |
+| <img src="docs/screenshots/02-memo-cross-agent-correlation.jpg" width="420" alt="Cross-agent correlation"> | <img src="docs/screenshots/03-memo-tradeoffs-success-metrics.jpg" width="420" alt="Trade-offs and success metrics"> |
 | *Synthesis agent tying an independently-flagged financial trend to a contract clause.* | *Every action item enforces Problem → Solution → Trade-offs → Success Metrics.* |
 
 | Retrieval-Grounded Contract Citation | Generalizes to a Second Data Room |
 |:---:|:---:|
-| ![Retrieval-grounded citation](docs/screenshots/08-retrieval-grounded-citation.jpg) | ![Second data room, northwind-fabrication](docs/screenshots/07-second-data-room-northwind.jpg) |
+| <img src="docs/screenshots/08-retrieval-grounded-citation.jpg" width="420" alt="Retrieval-grounded citation"> | <img src="docs/screenshots/07-second-data-room-northwind.jpg" width="420" alt="Second data room, northwind-fabrication"> |
 | *A dollar claim traced inline to `component_supply_agreement.pdf` — the citation is a real filename, not a paraphrase.* | *`northwind-fabrication`: an independently-messy second data room (duplicate CRM rows, comma-formatted numbers), not a hand-tuned demo.* |
 
 | Run History & Observability | Automated Test Suite |
 |:---:|:---:|
-| ![Run history SQL-backed observability](docs/screenshots/09-run-history-observability.jpg) | ![pytest 71 passed](docs/screenshots/10-pytest-suite.png) |
+| <img src="docs/screenshots/09-run-history-observability.jpg" width="420" alt="Run history SQL-backed observability"> | <img src="docs/screenshots/10-pytest-suite.png" width="420" alt="pytest 71 passed"> |
 | *Every `/diagnose` run logged to SQLite — company, grounding score, retry count, dollar impact — queryable via CLI or in-app.* | *71 tests across schemas, guardrails, normalization, and contract extraction — the same suite CI runs on every push.* |
 
 | Automated Citation-Grounding Eval | Branch Protection Enforcing CI |
 |:---:|:---:|
-| ![Grounding eval GROUNDING_OK](docs/screenshots/11-grounding-eval.png) | ![GitHub branch protection requiring the test check](docs/screenshots/12-branch-protection.png) |
+| <img src="docs/screenshots/11-grounding-eval.png" width="420" alt="Grounding eval GROUNDING_OK"> | <img src="docs/screenshots/12-branch-protection.png" width="420" alt="GitHub branch protection requiring the test check"> |
 | *Re-extracts every contract PDF fresh and verifies every cited clause is real — 6/6 grounded, not a cached or trusted result.* | *`master` requires the `test` GitHub Actions check, strict/up-to-date mode — merging without green CI isn't possible, not just discouraged.* |
 
 ---
