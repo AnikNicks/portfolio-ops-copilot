@@ -121,52 +121,7 @@ green required `test` check before merge, enforced by branch protection on `mast
 
 ## 📐 Project Architecture
 
-```text
-                    +-------------------------------+
-                    |     /diagnose <company>       |
-                    |   (Orchestrator, .claude/)     |
-                    +---------------+-----------------+
-                                    |
-                                    v
-                    +---------------+-----------------+
-                    |   ① Preflight Guardrail Check   |
-                    |  slug sanitized, inputs present  |
-                    +---------------+-----------------+
-                                    |
-                    +---------------+-----------------+
-                    |     Parallel Task Dispatch       |
-                    +----+-------------+-------------+-+
-                         |             |             |
-                         v             v             v
-                  [financial-    [data-quality-  [contract-
-                    analyst]        auditor]      reviewer]
-                         |             |             |
-                         v             v             v
-                  financial_    data_quality_   contract_risk_
-                  findings.json  findings.json   findings.json
-                         |             |             |
-                         +-------------+-------------+
-                                    |
-                                    v
-                    +---------------+-----------------+
-                    |  ② Post-Output Guardrail Check  |
-                    |  schema + business-rule validate |
-                    |  retry once, else hard-stop      |
-                    +---------------+-----------------+
-                                    |
-                                    v
-                    +---------------+-----------------+
-                    |        synthesis-writer          |
-                    |   (cross-agent correlation)       |
-                    +---------------+-----------------+
-                                    |
-                    (② guardrail re-applied to the final memo JSON)
-                                    v
-                    +---------------+-----------------+
-                    |  action_memo.json  +  <company>  |
-                    |   _value_creation_memo.md        |
-                    +-----------------------------------+
-```
+![System architecture diagram](docs/screenshots/13-system-architecture-diagram.png)
 
 ---
 
