@@ -44,7 +44,7 @@ def _arrow_safe(df: pd.DataFrame) -> pd.DataFrame:
     serialization then throws even though the surrounding try/except never sees it.
     """
     df = df.copy()
-    object_cols = df.select_dtypes(include="object").columns
+    object_cols = df.select_dtypes(include=["object", "str"]).columns
     df[object_cols] = df[object_cols].astype(str)
     return df
 
@@ -263,14 +263,14 @@ with col_before:
         st.markdown("**financials_raw.xlsx**")
         try:
             df = pd.read_excel(financials_path, sheet_name=0, header=2).dropna(how="all")
-            st.dataframe(_arrow_safe(df), use_container_width=True, height=250)
+            st.dataframe(_arrow_safe(df), width="stretch", height=250)
         except Exception as exc:  # noqa: BLE001 - demo-grade preview, not a pipeline path
             st.warning(f"Couldn't preview spreadsheet: {exc}")
 
     crm_path = company_dir / "crm_export.csv"
     if crm_path.exists():
         st.markdown("**crm_export.csv**")
-        st.dataframe(_arrow_safe(pd.read_csv(crm_path)), use_container_width=True, height=250)
+        st.dataframe(_arrow_safe(pd.read_csv(crm_path)), width="stretch", height=250)
 
     contracts_dir = company_dir / "contracts"
     if contracts_dir.exists():
@@ -367,9 +367,9 @@ with st.expander("Run history (SQL-backed observability)"):
     summary_rows = summary_by_company()
     if summary_rows:
         st.markdown("**Per-company summary**")
-        st.dataframe(pd.DataFrame(summary_rows), use_container_width=True)
+        st.dataframe(pd.DataFrame(summary_rows), width="stretch")
         st.markdown("**Most recent runs**")
-        st.dataframe(pd.DataFrame(all_runs()).head(10), use_container_width=True)
+        st.dataframe(pd.DataFrame(all_runs()).head(10), width="stretch")
     else:
         st.caption("No runs recorded yet — run `/diagnose <company>` at least once first.")
 

@@ -4,10 +4,10 @@
       "command": "docker",
       "args": ["mcp", "gateway", "run", "--profile", "portfolio-ops-copilot"],
       "env": {
-        "LOCALAPPDATA": "<ABSOLUTE_PATH_TO_LOCALAPPDATA>",
+        "LOCALAPPDATA": "C:\\Users\\anikd\\AppData\\Local",
         "ProgramData": "C:\\ProgramData",
         "ProgramFiles": "C:\\Program Files",
-        "MCP_GATEWAY_DOCKER_BIND_ALLOWED_PATHS": "<ABSOLUTE_PATH_TO_REPO>/data/synthetic"
+        "MCP_GATEWAY_DOCKER_BIND_ALLOWED_PATHS": "/Users/anikd/Documents/GenAI Projects/Cursor/portfolio-diagnostics-agent-claude-code/data/synthetic"
       },
       "type": "stdio"
     }
